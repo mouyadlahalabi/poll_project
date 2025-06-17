@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>جميع الاستبيانات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .survey {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 4px solid #3498db;
+            border-radius: 8px;
+        }
+        .survey-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .survey-description {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        .buttons a, .buttons button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+        .buttons .delete-btn {
+            background-color: red;
+        }
+        .buttons .share-btn {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📋 قائمة الاستبيانات</h1>
+
+    {% if surveys %}
+        {% for survey in surveys %}
+            <div class="survey">
+                <div class="survey-title">{{ survey.title }}</div>
+                <div class="survey-description">{{ survey.description }}</div>
+
+                <div class="buttons">
+                    <a href="{% url 'surveys:edit_survey' survey.id %}">✏️ تعديل</a>
+
+                    <!-- رابط عرض الاستبيان -->
+                    <a href="{% url 'surveys:view_survey' survey.id %}">👁️ عرض</a>
+
+                    <!-- زر مشاركة الاستبيان: ينسخ الرابط -->
+                    <button class="share-btn" onclick="copyToClipboard('{{ request.scheme }}://{{ request.get_host }}{% url 'surveys:view_survey' survey.id %}')"
+                    >🔗 مشاركة</button>
+
+                    <form method="post" action="{% url 'surveys:delete_survey' survey.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn">🗑️ حذف</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>لا توجد استبيانات حالياً.</p>
+    {% endif %}
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert("تم نسخ رابط الاستبيان!");
+            }, function(err) {
+                alert("فشل النسخ: " + err);
+            });
+        }
+    </script>
+
+</body>
+</html>

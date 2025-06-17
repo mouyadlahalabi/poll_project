@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الاستبيانات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #333;
+            color: #fff;
+            position: fixed;
+            padding: 20px;
+            right: 0;
+        }
+
+        .sidebar h2 {
+            color: #fff;
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 10px 0;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+
+        .main {
+            margin-right: 270px;
+            padding: 20px;
+        }
+
+        .add-survey-btn {
+            display: block;
+            width: 100px;
+            height: 100px;
+            margin: 50px auto;
+            background-color: #5cb85c;
+            color: white;
+            border-radius: 50%;
+            font-size: 50px;
+            text-align: center;
+            line-height: 100px;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .add-survey-btn:hover {
+            background-color: #4cae4c;
+            transform: scale(1.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #5cb85c;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .survey-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .survey-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .survey-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .survey-item a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .badge {
+            background-color: #5cb85c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .no-surveys {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>لوحة التحكم</h2>
+        <ul>
+            <li><a href="#">الصفحة الرئيسية</a></li>
+            <li><a href="{% url 'surveys:list_surveys' %}">استبياناتي</a></li>
+            <li><a href="{% url 'users:logout' %}">تسجيل الخروج</a></li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <h1>إدارة الاستبيانات</h1>
+
+        
+        <div class="survey-list">
+            <a href="{% url 'surveys:create_survey' %}" class="add-survey-btn">+</a>
+            <p>اضغط على زر + لإنشاء استبيان جديد</p>
+        </div>
+
+        
+        </div>
+    </div>
+
+</body>
+
+</html>

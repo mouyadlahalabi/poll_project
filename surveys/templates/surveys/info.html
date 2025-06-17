@@ -1,0 +1,5 @@
+{% if user.surveys.all %}
+                <ul>
+                    {% for survey in user.surveys.all %}
+                        <li>{{ survey.title }}</li>
+                    {% endfor %}

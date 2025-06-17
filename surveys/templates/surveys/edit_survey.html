@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تعديل الاستبيان</title>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .question-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+        }
+        button {
+            margin-top: 10px;
+            margin-left: 5px;
+            padding: 8px 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.cancel-question {
+            background: #e74c3c;
+        }
+        button.edit-question {
+            background: #2ecc71;
+        }
+        button.add-option {
+            background: #9b59b6;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .options input {
+            width: calc(100% - 20px);
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✏️ تعديل الاستبيان</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div>
+        <label>اسم الاستبيان:</label>
+        <input type="text" name="title" value="{{ survey.title }}" required>
+    </div>
+
+    <div>
+        <label>وصف الاستبيان:</label>
+        <textarea name="description">{{ survey.description }}</textarea>
+    </div>
+
+    <div id="questionsContainer">
+        <h2>الأسئلة:</h2>
+
+        {% for question in questions %}
+            <div class="question-box">
+                <input type="text" name="question_{{ question.id }}_text" value="{{ question.text }}" required>
+
+                <select name="question_{{ question.id }}_type" class="question-type">
+                    <option value="text" {% if question.question_type == "text" %}selected{% endif %}>نصي</option>
+                    <option value="single" {% if question.question_type == "single" %}selected{% endif %}>اختيار وحيد</option>
+                    <option value="multiple" {% if question.question_type == "multiple" %}selected{% endif %}>اختيار متعدد</option>
+                </select>
+
+                <div class="options" {% if question.question_type == 'text' %}style="display:none;"{% endif %}>
+                    {% for option in question.options.all %}
+                        <input type="text" name="question_{{ question.id }}_option_{{ forloop.counter }}" value="{{ option.text }}">
+                    {% endfor %}
+                </div>
+            </div>
+        {% empty %}
+            <p>لا توجد أسئلة حالياً.</p>
+        {% endfor %}
+    </div>
+
+    <button type="button" id="addQuestion">➕ إضافة سؤال جديد</button>
+    <button type="submit">💾 تحديث الاستبيان</button>
+</form>
+
+<!-- قالب سؤال جديد -->
+<template id="questionTemplate">
+    <div class="question-box new-question">
+        <input type="text" name="new_question_text[]" placeholder="نص السؤال الجديد" required>
+        <select name="new_question_type[]" class="question-type">
+            <option value="text">نصي</option>
+            <option value="single">اختيار وحيد</option>
+            <option value="multiple">اختيار متعدد</option>
+        </select>
+
+        <div class="options" style="display:none;"></div>
+        <button type="button" class="add-option">➕ إضافة خيار</button>
+        <button type="button" class="cancel-question">❌ حذف السؤال</button>
+    </div>
+</template>
+
+<script>
+    document.getElementById('addQuestion').addEventListener('click', function () {
+        const template = document.getElementById('questionTemplate').content.cloneNode(true);
+        document.getElementById('questionsContainer').appendChild(template);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('add-option')) {
+            const box = e.target.closest('.question-box');
+            const optionsDiv = box.querySelector('.options');
+            const index = Array.from(document.querySelectorAll('.new-question')).indexOf(box);
+            const optionInput = document.createElement('input');
+            optionInput.type = 'text';
+            optionInput.name = `new_question_option_${index}[]`;
+            optionInput.placeholder = 'خيار جديد';
+            optionsDiv.appendChild(optionInput);
+        }
+
+        if (e.target.classList.contains('cancel-question')) {
+            e.target.closest('.question-box').remove();
+        }
+    });
+
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('question-type')) {
+            const box = e.target.closest('.question-box');
+            const optionsDiv = box.querySelector('.options');
+            optionsDiv.style.display = e.target.value === 'text' ? 'none' : 'block';
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>لوحة تحكم الادمن - المستخدمون واستبياناتهم</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+  }
+
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .user-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 280px;
+    padding: 20px;
+    box-sizing: border-box;
+    direction: rtl;
+    cursor: default;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .user-card:hover {
+    transform: scale(1.05);
+  }
+
+  .user-name {
+    font-weight: bold;
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .user-email {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .survey-count {
+    background-color: #5cb85c;
+    color: white;
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: inline-block;
+    font-size: 14px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .surveys-list {
+    max-height: 140px;
+    overflow-y: auto;
+    padding-left: 15px;
+    margin-bottom: 15px;
+  }
+
+  .surveys-list li {
+    font-size: 14px;
+    margin-bottom: 6px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 20px;
+    position: relative;
+  }
+  .surveys-list li::before {
+    content: "📋";
+    position: absolute;
+    right: 0;
+  }
+
+  .survey-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .survey-view-button {
+    background-color: #0275d8;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 13px;
+  }
+
+  .survey-delete-form {
+    margin: 0;
+  }
+
+  .survey-delete-button {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 0;
+  }
+
+  .no-surveys {
+    font-size: 13px;
+    color: #999;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 15px;
+  }
+
+  .user-delete-form {
+    text-align: center;
+  }
+
+  .user-delete-button {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .user-delete-button:hover {
+    background-color: #c9302c;
+  }
+
+  a.logout-link {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #d9534f;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    z-index: 1000;
+    transition: background-color 0.3s ease;
+  }
+  a.logout-link:hover {
+    background-color: #c9302c;
+  }
+</style>
+</head>
+<body>
+
+<a href="{% url 'users:logout' %}" class="logout-link">تسجيل الخروج</a>
+
+<h1>لوحة تحكم الادمن - المستخدمون واستبياناتهم</h1>
+
+<div class="container">
+  {% for user in users %}
+  <div class="user-card">
+    <div>
+      <div class="user-name">{{ user.username }}</div>
+      <div class="user-email">{{ user.email }}</div>
+      <div class="survey-count">عدد الاستبيانات: {{ user.survey_count }}</div>
+
+      {% if user.surveys.all %}
+        <ul class="surveys-list">
+          {% for survey in user.surveys.all %}
+            <li>
+              <span>{{ survey.title }}</span>
+              <div class="survey-actions">
+                <a href="{% url 'surveys:view_survey' survey.id %}" class="survey-view-button" title="عرض الاستبيان">👁 عرض</a>
+                <form action="{% url 'surveys:delete_survey' survey.id %}" method="post" class="survey-delete-form">
+                  {% csrf_token %}
+                  <button type="submit" onclick="return confirm('هل أنت متأكد من حذف هذا الاستبيان؟');" class="survey-delete-button" title="حذف الاستبيان">
+                    ❌
+                  </button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="no-surveys">لا توجد استبيانات</div>
+      {% endif %}
+    </div>
+
+    <form action="{% url 'users:delete_user' user.id %}" method="post" class="user-delete-form">
+      {% csrf_token %}
+      <button type="submit" onclick="return confirm('هل أنت متأكد من حذف هذا المستخدم؟');" class="user-delete-button">
+        ❌ حذف المستخدم
+      </button>
+    </form>
+  </div>
+  {% empty %}
+  <p style="text-align:center;">لا يوجد مستخدمون.</p>
+  {% endfor %}
+</div>
+
+</body>
+</html>
